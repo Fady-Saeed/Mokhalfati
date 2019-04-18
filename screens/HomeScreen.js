@@ -1,13 +1,12 @@
 import React from 'react';
 import { ImagePicker, Camera, Permissions } from 'expo';
-import Constants from '../constants/Layout'
+import GlobalStyle from '../constants/GlobalStyles'
 
 import {
   Button,
   Image,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -24,16 +23,17 @@ export default class HomeScreen extends React.Component {
   }
   componentDidUpdate(prevPops, prevState) {
     if (prevState.image !== this.state.image) {
-      // Send the image to be processed
-      // Change the screen to the results screen
+      this.props.navigation.navigate('Fines',{
+        image: this.state.image
+      })
     }
   }
   render() {
     return (
-      <View style={styles.container}>
-        <MonoText style={styles.logo}>Mokhalafati</MonoText>
+      <View style={GlobalStyle.container}>
+        <MonoText style={GlobalStyle.logo}>Mokhalafati</MonoText>
         <MonoText>Pick an image from:</MonoText>
-        <View style={styles.flexRow}>
+        <View style={GlobalStyle.flexRow}>
           <Button
             title="Gallery"
             onPress={this._pickImageFromGallery}
@@ -64,19 +64,3 @@ export default class HomeScreen extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: Constants.statusBarHeight,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  logo: {
-    fontSize: 50,
-    fontWeight: '500',
-    paddingBottom: 50
-  },
-  flexRow: {
-    flexDirection: 'row'
-  }
-});
