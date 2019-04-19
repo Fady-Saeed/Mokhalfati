@@ -1,15 +1,9 @@
-import React from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  View,
-  Image,
-  Text
-} from 'react-native';
-import Colors from '../constants/Colors'
-import Constants from '../constants/Layout'
-import GlobalStyle from '../constants/GlobalStyles'
-import { MonoText } from '../components/StyledText';
+import React from "react";
+import { ActivityIndicator, StyleSheet, View, Image, Text } from "react-native";
+import Colors from "../constants/Colors";
+import Constants from "../constants/Layout";
+import GlobalStyle from "../constants/GlobalStyles";
+import { MonoText } from "../components/StyledText";
 
 export default class FineScreen extends React.Component {
   static navigationOptions = {
@@ -19,9 +13,9 @@ export default class FineScreen extends React.Component {
     isReady: false,
     fine: -1,
     image: null
-  }
+  };
   componentDidMount() {
-    this._getFines()
+    this._getFines();
   }
   render() {
     if (!this.state.isReady) {
@@ -33,23 +27,33 @@ export default class FineScreen extends React.Component {
     }
     return (
       <View style={GlobalStyle.container}>
-        <MonoText style={GlobalStyle.logo}>Mokhalafati</MonoText>
+        <Image source={require("../assets/images/MokhalfatiLOGO.png")} />
+        {/*<MonoText style={GlobalStyle.logo}>Mokhalafati</MonoText>*/}
         <Image source={{ uri: this.state.image }} style={styles.image} />
-        {this.state.fine && <View style={GlobalStyle.flexRow}>
-          <Text style={GlobalStyle.textBold}>You have to pay </Text>
-          <Text>{this.state.fine} EGP</Text>
-        </View>}
-        {!this.state.fine && <View style={GlobalStyle.flexRow}>
-          <Text style={GlobalStyle.textBold}>You don't have to pay a penny</Text>
-        </View>}
+        {this.state.fine && (
+          <View style={GlobalStyle.flexRow}>
+            <Text style={GlobalStyle.textBold}>You have to pay </Text>
+            <Text>{this.state.fine} EGP</Text>
+          </View>
+        )}
+        {!this.state.fine && (
+          <View style={GlobalStyle.flexRow}>
+            <Text style={GlobalStyle.textBold}>
+              You don't have to pay a penny
+            </Text>
+          </View>
+        )}
       </View>
     );
   }
   _getFines = async () => {
     // Send the image to be processed
-    // Change the screen to the results screen 
-    this.setState({ isReady: true, image: this.props.navigation.getParam('image') })
-  }
+    // Change the screen to the results screen
+    this.setState({
+      isReady: true,
+      image: this.props.navigation.getParam("image")
+    });
+  };
 }
 
 const styles = StyleSheet.create({
@@ -57,4 +61,4 @@ const styles = StyleSheet.create({
     width: Constants.window.width * 0.9,
     height: 300
   }
-})
+});

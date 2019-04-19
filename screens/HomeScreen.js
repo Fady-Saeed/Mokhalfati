@@ -1,6 +1,6 @@
-import React from 'react';
-import { ImagePicker, Camera, Permissions } from 'expo';
-import GlobalStyle from '../constants/GlobalStyles'
+import React from "react";
+import { ImagePicker, Camera, Permissions } from "expo";
+import GlobalStyle from "../constants/GlobalStyles";
 
 import {
   Button,
@@ -10,57 +10,65 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
+  StyleSheet
+} from "react-native";
 
-import { MonoText } from '../components/StyledText';
+import { MonoText } from "../components/StyledText";
+const styles = StyleSheet.create({
+  text: {
+    marginTop: 11,
+    fontWeight: "bold"
+  }
+});
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
-    header: null,
+    header: null
   };
   state = {
     image: null
-  }
+  };
   componentDidUpdate(prevPops, prevState) {
     if (prevState.image !== this.state.image) {
-      this.props.navigation.navigate('Fines',{
+      this.props.navigation.navigate("Fines", {
         image: this.state.image
-      })
+      });
     }
   }
   render() {
     return (
       <View style={GlobalStyle.container}>
-        <MonoText style={GlobalStyle.logo}>Mokhalafati</MonoText>
-        <MonoText>Pick an image from:</MonoText>
+        <Image source={require("../assets/images/MokhalfatiLOGO.png")} />
+        {/*<MonoText style={GlobalStyle.logo}>Mokhalfati</MonoText>*/}
+        <MonoText>Pick your car license ID image from:</MonoText>
         <View style={GlobalStyle.flexRow}>
-          <Button
-            title="Gallery"
-            onPress={this._pickImageFromGallery}
-          />
-          <Button
-            title="Camera"
-            onPress={this._pickImageFromCameraRoll}
-          />
+          <Button title="Gallery" onPress={this._pickImageFromGallery} />
+          <Text style={styles.text}> OR </Text>
+          <Button title="Camera" onPress={this._pickImageFromCameraRoll} />
         </View>
       </View>
-
     );
   }
 
   _pickImageFromGallery = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({ allowsEditing: true });
+    const { statusCameraRoll } = await Permissions.askAsync(
+      Permissions.CAMERA_ROLL
+    );
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true
+    });
     if (!result.cancelled) {
       this.setState({ image: result.uri });
     }
   };
   _pickImageFromCameraRoll = async () => {
     const { statusCamera } = await Permissions.askAsync(Permissions.CAMERA);
-    const { statusCameraRoll } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-    let result = await ImagePicker.launchCameraAsync({ allowsEditing: true })
+    const { statusCameraRoll } = await Permissions.askAsync(
+      Permissions.CAMERA_ROLL
+    );
+    let result = await ImagePicker.launchCameraAsync({ allowsEditing: true });
     if (!result.cancelled) {
-      this.setState({ image: result.uri })
+      this.setState({ image: result.uri });
     }
-  }
+  };
 }
-
