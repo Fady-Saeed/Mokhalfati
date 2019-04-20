@@ -4,6 +4,7 @@ import Colors from "../constants/Colors";
 import Constants from "../constants/Layout";
 import GlobalStyle from "../constants/GlobalStyles";
 import { MonoText } from "../components/StyledText";
+import { PLATE_FORMAT, getFines } from "../api/fines"
 
 export default class FineScreen extends React.Component {
   static navigationOptions = {
@@ -30,28 +31,37 @@ export default class FineScreen extends React.Component {
         <Image source={require("../assets/images/MokhalfatiLOGO.png")} />
         {/*<MonoText style={GlobalStyle.logo}>Mokhalafati</MonoText>*/}
         <Image source={{ uri: this.state.image }} style={styles.image} />
-        {this.state.fine && (
+        {(this.state.fine)?(
           <View style={GlobalStyle.flexRow}>
             <Text style={GlobalStyle.textBold}>You have to pay </Text>
             <Text>{this.state.fine} EGP</Text>
           </View>
-        )}
-        {!this.state.fine && (
+        ):null}
+        {(!this.state.fine)?(
           <View style={GlobalStyle.flexRow}>
-            <Text style={GlobalStyle.textBold}>
-              You don't have to pay a penny
-            </Text>
+            <Text style={GlobalStyle.textBold}>You don't have to pay a penny</Text>
           </View>
-        )}
+        ):null}
       </View>
     );
   }
   _getFines = async () => {
     // Send the image to be processed
-    // Change the screen to the results screen
+    
+    // Get fines from the traffic fines api
+    const driverLicense = {
+      type: PLATE_FORMAT.ALPHA_NUMERIC,
+      firstLetter: "ن",
+      secondLetter: "ط",
+      thirdLetter: "ب",
+      digits: 648
+    }
+    const fine = await getFines(driverLicense)
+    // Update the screen state
     this.setState({
       isReady: true,
-      image: this.props.navigation.getParam("image")
+      image: this.props.navigation.getParam("image"),
+      fine: fine
     });
   };
 }

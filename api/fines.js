@@ -1,37 +1,56 @@
-const cheerio = require('cheerio')
-const request = require('request-promise')
+import cheerio from 'react-native-cheerio'
+import fetch from 'node-fetch'
 
-const getInputs = html => {
+const getFormParams = html => {
     const keys = ["__LASTFOCUS", "__EVENTTARGET", "__EVENTARGUMENT", "__VIEWSTATE", "__EVENTVALIDATION", "SenderID", "RandomSecret", "RequestObject", "HasedRequestObject", "cSearch$PlateFormat", "cSearch$txtPlateAlpaNum$txtFL", "cSearch$txtPlateAlpaNum$txtSL", "cSearch$txtPlateAlpaNum$txtTL", "cSearch$txtPlateAlpaNum$txtDg", "cSearch$txtPlateNum", "cSearch$btnSearch", "cSearch$ddlPlateType", "cSearch$ddlGovern"]
     const $ = cheerio.load(html)
-    const inputs = {}
+    const params = {}
     $('input').each((i, ele) => {
         if (keys.indexOf($(ele).attr("name")) != -1)
-            inputs[$(ele).attr("name")] = $(ele).val() || ""
+            params[$(ele).attr("name")] =  $(ele).val() || ""
     })
-    return inputs
+    return params
 }
 
 const parseFines = html => {
     const $ = cheerio.load(html)
-    return $('#cFinesSummary_lblTotalNew').text()
+    const finesText = $('#cFinesSummary_lblTotalNew').text()
+    const finesValue = +finesText.split(' ')[0]
+    if (finesValue !== NaN)
+        return finesValue
+    return 0
 }
 
-export const getFines = async () => {
+export const PLATE_FORMAT = {
+    ALPHA_NUMERIC: "rdAlphaNum",
+    NUMERIC: "rdNum",
+}
+
+export const getFines = async (driverLicenseDataObject) => {
     const API_URL = "https://www.egypt.gov.eg/mobile/Services/NTPMOJ-GG/functions/PayFines.aspx"
-    const form = await request.get(API_URL)
-    const inputs = getInputs(form)
-    inputs["cSearch$txtPlateAlpaNum$txtFL"] = 'ن'
-    inputs["cSearch$txtPlateAlpaNum$txtSL"] = 'ط'
-    inputs["cSearch$txtPlateAlpaNum$txtTL"] = 'ب'
-    inputs["cSearch$txtPlateAlpaNum$txtDg"] = "648"
-    inputs["cSearch$PlateFormat"] = "rdAlphaNum"
+    const form = await fetch(API_URL)
+    const formText = await form.text()
+    const params = getFormParams(formText)
+    params["cSearch$PlateFormat"] =  PLATE_FORMAT.ALPHA_NUMERIC
+    switch (driverLicenseDataObject.type) {
+        case PLATE_FORMAT.ALPHA_NUMERIC:
+            params["cSearch$txtPlateAlpaNum$txtFL"] = driverLicenseDataObject.firstLetter
+            params["cSearch$txtPlateAlpaNum$txtSL"] = driverLicenseDataObject.secondLetter
+            params["cSearch$txtPlateAlpaNum$txtTL"] = driverLicenseDataObject.thirdLetter
+            params["cSearch$txtPlateAlpaNum$txtDg"] = driverLicenseDataObject.digits + ""
+            break;
+    }
+    const formData = new FormData()
+    for (var key in params)
+        formData.append(key, params[key]);
+    
     const options = {
-        url: API_URL,
         method: 'POST',
         headers: { referer: API_URL },
-        form: inputs
+        body: formData
     }
-    const fines = await request(options)
-    return parseFines(fines)
+
+    const fines = await fetch(API_URL, options)
+    const finesText = await fines.text()
+    return parseFines(finesText)
 }
