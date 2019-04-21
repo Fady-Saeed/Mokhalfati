@@ -31,7 +31,8 @@ export default class HomeScreen extends React.Component {
   componentDidUpdate(prevPops, prevState) {
     if (prevState.image !== this.state.image) {
       this.props.navigation.navigate("Fines", {
-        image: this.state.image
+        image: this.state.image,
+        image64: this.state.image64
       });
     }
   }
@@ -55,10 +56,11 @@ export default class HomeScreen extends React.Component {
       Permissions.CAMERA_ROLL
     );
     let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true
+      allowsEditing: true,
+      base64: true
     });
     if (!result.cancelled) {
-      this.setState({ image: result.uri });
+      this.setState({ image: result.uri, image64: result.base64 });
     }
   };
   _pickImageFromCameraRoll = async () => {
@@ -66,9 +68,9 @@ export default class HomeScreen extends React.Component {
     const { statusCameraRoll } = await Permissions.askAsync(
       Permissions.CAMERA_ROLL
     );
-    let result = await ImagePicker.launchCameraAsync({ allowsEditing: true });
+    let result = await ImagePicker.launchCameraAsync({ allowsEditing: true, base64: true });
     if (!result.cancelled) {
-      this.setState({ image: result.uri });
+      this.setState({ image: result.uri, image64: result.base64 });
     }
   };
 }
