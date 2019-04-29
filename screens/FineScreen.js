@@ -69,7 +69,8 @@ export default class FineScreen extends React.Component {
 
 const styles = StyleSheet.create({
   image: {
-    width: Constants.window.width * 0.9,
-    height: 300
+    width: Constants.window.width,
+    height: 300,
+    resizeMode: "contain"
   }
 });
