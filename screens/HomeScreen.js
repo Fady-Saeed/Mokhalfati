@@ -28,6 +28,7 @@ export default class HomeScreen extends React.Component {
   state = {
     image: null
   };
+
   componentDidUpdate(prevPops, prevState) {
     if (prevState.image !== this.state.image) {
       this.props.navigation.navigate("Fines", {
@@ -36,6 +37,7 @@ export default class HomeScreen extends React.Component {
       });
     }
   }
+
   render() {
     return (
       <View style={GlobalStyle.container}>
