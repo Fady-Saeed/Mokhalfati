@@ -17,8 +17,13 @@ const getFormParams = html => {
 
 const parseDetailedFines = html => {
     const details = {
+<<<<<<< HEAD
         totalWithoutTaxes: 0,
         taxes: 0,
+=======
+        totalWithoutTaxes: -1,
+        taxes: -1,
+>>>>>>> develop
         detailedList: []
     }
     const $ = cheerio.load(html)
@@ -42,6 +47,13 @@ const parseDetailedFines = html => {
                 details.taxes = +tableInnerRowData.find(".FineValue").eq(0).text()
         }
     })
+    if(details.totalWithoutTaxes === -1 && details.taxes === -1 && details.detailedList.length === 0) {
+        return {
+            type: "error",
+            message: "National ID Number doesn't match with the car owner's"
+        }
+    }
+    details.type = "success"
     return details
 }
 
