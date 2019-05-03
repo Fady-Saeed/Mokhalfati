@@ -106,10 +106,7 @@ export default class FineScreen extends React.Component {
       Permissions.CAMERA_ROLL
     );
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: false,
-      base64: true
-    });
+    let result = await ImagePicker.launchImageLibraryAsync({ allowsEditing: Platform.OS !== 'ios', base64: true });
 
     if (!result.cancelled) {
       this.setState({ licenseImage: result.uri, image64: result.base64 });

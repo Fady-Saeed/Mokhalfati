@@ -1,6 +1,6 @@
 import cheerio from 'react-native-cheerio'
 import fetch from 'node-fetch'
-import {__VIEWSTATE, __EVENTVALIDATION} from 'keys'
+import {__VIEWSTATE, __EVENTVALIDATION} from './keys'
 
 const getFormParams = html => {
     const keys = ["__LASTFOCUS", "__EVENTTARGET", "__EVENTARGUMENT", "__VIEWSTATE", "__VIEWSTATEGENERATOR", "__EVENTVALIDATION", "SenderID", "RandomSecret", "RequestObject", "HasedRequestObject"]//, "cConfirmOwner$txtIDNum", "cConfirmOwner$btnFineDetails"]
@@ -17,13 +17,8 @@ const getFormParams = html => {
 
 const parseDetailedFines = html => {
     const details = {
-<<<<<<< HEAD
-        totalWithoutTaxes: 0,
-        taxes: 0,
-=======
         totalWithoutTaxes: -1,
         taxes: -1,
->>>>>>> develop
         detailedList: []
     }
     const $ = cheerio.load(html)
@@ -68,7 +63,7 @@ export const getDetailedFines = async (driverLicenseDataObject) => {
         formData.append(key, params[key]);
     
     formData.append("cConfirmOwner$btnFineDetails", "تفاصيل المخالفات")
-    formData.append("cConfirmOwner$txtIDNum", driverLicenseDataObject.nationalID)
+    formData.append("cConfirmOwner$txtIDNum", driverLicenseDataObject.nationalID.trim())
 
     const options = {
         method: 'POST',
@@ -78,5 +73,6 @@ export const getDetailedFines = async (driverLicenseDataObject) => {
 
     const detailedFinesPage = await fetch(API_URL, options)
     const detailedFinesText = await detailedFinesPage.text()
+    console.log(parseDetailedFines(detailedFinesText))
     return parseDetailedFines(detailedFinesText)
 }
