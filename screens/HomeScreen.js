@@ -42,7 +42,7 @@ export default class HomeScreen extends React.Component {
   render() {
     return (
       <View style={GlobalStyle.container}>
-        <Image style={{ width: 250, height: 250 }} source={require("../assets/images/MokhalfatiLOGO.png")} />
+        <Animatable.Image animation="fadeInLeftBig" duration={2000} style={{ width: 250, height: 250 }} source={require("../assets/images/MokhalfatiLOGO.png")} />
         {/*<MonoText style={GlobalStyle.logo}>Mokhalfati</MonoText>*/}
         <Text style={{ fontSize: 20, marginTop: 6 }}>Pick your car license ID image from:</Text>
         <View style={GlobalStyle.flexRow}>
@@ -59,7 +59,7 @@ export default class HomeScreen extends React.Component {
       Permissions.CAMERA_ROLL
     );
     let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
+      allowsEditing: Platform.OS !== 'ios',
       base64: true
     });
     if (!result.cancelled) {
@@ -71,7 +71,7 @@ export default class HomeScreen extends React.Component {
     const { statusCameraRoll } = await Permissions.askAsync(
       Permissions.CAMERA_ROLL
     );
-    let result = await ImagePicker.launchCameraAsync({ allowsEditing: true, base64: true });
+    let result = await ImagePicker.launchCameraAsync({ allowsEditing: Platform.OS !== 'ios', base64: true });
     if (!result.cancelled) {
       this.setState({ image: result.uri, image64: result.base64 });
     }

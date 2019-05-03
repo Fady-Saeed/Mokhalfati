@@ -1,6 +1,7 @@
 import React from "react";
 import { ActivityIndicator, StyleSheet, ScrollView, View, Image, Text } from "react-native";
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
+import * as Animatable from 'react-native-animatable';
 import Colors from "../constants/Colors";
 import Constants from "../constants/Layout";
 import GlobalStyle from "../constants/GlobalStyles";
@@ -36,12 +37,12 @@ export default class DetailsScreen extends React.Component {
         }
         return (
             <View style={GlobalStyle.container}>
-                <Image source={require("../assets/images/MokhalfatiLOGO.png")} style={{ height: 100, width: 100 }} />
+                <Animatable.Image animation="rotate" duration={2000} iterationCount={5} iterationDelay={1000} source={require("../assets/images/MokhalfatiLOGO.png")} style={{ height: 100, width: 100 }} />
 
                 {(this.state.fineDetails.detailedList.length > 0) ? (
                     <ScrollView>
                         <Image source={{ uri: this.state.image }} style={styles.image} />
-                        <Text style={{ justifyContent: "center", textAlign: "center", fontWeight: "bold" }}>You have to pay {this.state.fineDetails.totalWithoutTaxes} EGP in addition to taxes of {this.state.fineDetails.taxes} EGP </Text>
+                        <Text style={{ justifyContent: "center", textAlign: "center", fontWeight: "bold", marginTop: 5, fontSize: 18, padding: 5 }}>You have to pay {this.state.fineDetails.totalWithoutTaxes} EGP in addition to taxes of {this.state.fineDetails.taxes} EGP </Text>
                         <View style={styles.container}>
                             <Table borderStyle={{ borderWidth: 4, borderColor: '#c8e1ff' }}>
                                 <Row data={this.tableHeaders} style={styles.head} textStyle={styles.headerText} />
@@ -55,7 +56,7 @@ export default class DetailsScreen extends React.Component {
 
                 {(this.state.fineDetails.type && this.state.fineDetails.type === "error") ? (
                     <View style={GlobalStyle.container}>
-                        <Text style={{ fontWeight: "bold", color: "#ff0000" }}> {fineDetails.message} </Text>
+                        <Text style={{ fontWeight: "bold", color: "#ff0000" }}> {this.state.fineDetails.message} </Text>
                     </View>
                 ) : null}
             </View>
@@ -97,5 +98,5 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff'
     },
     text: { margin: 6 },
-    headerText: { margin: 6, fontWeight: "bold" }
+    headerText: { margin: 6, fontWeight: "bold", fontSize: 16 }
 });

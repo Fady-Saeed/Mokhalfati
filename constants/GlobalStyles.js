@@ -18,6 +18,6 @@ export default StyleSheet.create({
     flexDirection: 'row'
   },
   textBold: {
-    fontWeight: '500'
+    fontWeight: 'bold'
   }
 });

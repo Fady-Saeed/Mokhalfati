@@ -1,6 +1,7 @@
 import React from "react";
 import { ActivityIndicator, StyleSheet, View, Image, Text, Button, Platform } from "react-native";
 import { ImagePicker, Camera, Permissions } from "expo";
+import * as Animatable from 'react-native-animatable';
 import Colors from "../constants/Colors";
 import Constants from "../constants/Layout";
 import GlobalStyle from "../constants/GlobalStyles";
@@ -46,9 +47,9 @@ export default class FineScreen extends React.Component {
     }
     return (
       <View style={GlobalStyle.container}>
-        <Image source={require("../assets/images/MokhalfatiLOGO.png")} style={{ height: 150, width: 150 }} />
+        <Animatable.Image animation="rotate" duration={2000} iterationCount={5} iterationDelay={1000} source={require("../assets/images/MokhalfatiLOGO.png")} style={{ height: 100, width: 100 }} />
 
-        <Text style={{ fontWeight: "bold", margin: 5, fontSize: 18 }}> Your Car license plate ID is {this.state.firstLetter} {this.state.secondLetter} {this.state.thirdLetter} {this.state.digits}</Text>
+        <Text style={{ fontWeight: "bold", margin: 5, fontSize: 20 }}> Your Car license plate ID is {this.state.firstLetter} {this.state.secondLetter} {this.state.thirdLetter} {this.state.digits}</Text>
         {(this.state.fine) ? (
           <ScrollView>
             <View style={{ alignItems: "center" }}>
@@ -56,7 +57,7 @@ export default class FineScreen extends React.Component {
 
 
 
-              <Text style={{ fontSize: 20, fontWeight: "bold" }}>You have to pay {this.state.fine} EGP {"\n"} </Text>
+              <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 5 }}>You have to pay {this.state.fine} EGP {"\n"} </Text>
 
               <Text style={{ fontWeight: "bold", color: "#ff0000" }}> Need more Details ? {"\n"} </Text>
               <Text style={{ fontSize: 16 }}>Pick car owner driving license image from:</Text>
@@ -70,8 +71,10 @@ export default class FineScreen extends React.Component {
 
         ) : null}
         {(!this.state.fine) ? (
-          <View style={GlobalStyle.flexRow}>
-            <Text style={GlobalStyle.textBold}>You don't have to pay a penny</Text>
+          <View style={{ alignItems: "center" }}>
+            <Image source={{ uri: this.state.image }} style={styles.image} />
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}> Nice!, You are a committed driver{"\n"}</Text>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#ff0000" }}>You don't have to pay a penny</Text>
           </View>
         ) : null}
       </View>
@@ -106,7 +109,7 @@ export default class FineScreen extends React.Component {
       Permissions.CAMERA_ROLL
     );
 
-    let result = await ImagePicker.launchImageLibraryAsync({ allowsEditing: Platform.OS !== 'ios', base64: true });
+    let result = await ImagePicker.launchImageLibraryAsync({ allowsEditing: true/*Platform.OS !== 'ios'*/, base64: true });
 
     if (!result.cancelled) {
       this.setState({ licenseImage: result.uri, image64: result.base64 });
@@ -129,7 +132,7 @@ const styles = StyleSheet.create({
   image: {
     width: Constants.window.width,
     height: 300,
-    resizeMode: "contain"
+    resizeMode: "contain",
   },
   text: {
     marginTop: 11,
