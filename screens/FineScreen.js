@@ -13,7 +13,11 @@ export default class FineScreen extends React.Component {
     header: null
   };
   state = {
-    isReady: false,
+    firstLetter: null,
+    secondLetter: null,
+    thirdLetter: null,
+    digits: null,
+    isReady: true,
     fine: -1,
     image: null,
     licenseImage: null,
@@ -41,15 +45,16 @@ export default class FineScreen extends React.Component {
     }
     return (
       <View style={GlobalStyle.container}>
-        <Image source={require("../assets/images/MokhalfatiLOGO.png")} />
-        {/*<MonoText style={GlobalStyle.logo}>Mokhalafati</MonoText>*/}
+        <Image source={require("../assets/images/MokhalfatiLOGO.png")} style={{ height: 150, width: 150 }} />
+        <Text> {this.state.firstLetter}{this.state.secondLetter}{this.state.thirdLetter}{this.state.digits}</Text>
         <Image source={{ uri: this.state.image }} style={styles.image} />
         {(this.state.fine) ? (
-          <View style={{ justifyContent: 'center' }}>
-            <Text style={GlobalStyle.textBold}>You have to pay {this.state.fine} EGP {"\n"} </Text>
-            {/*<Text> </Text>*/}
-            <Text>More Details ? {"\n"} </Text>
-            <MonoText>Pick car owner driving license image from:</MonoText>
+          <View style={{ alignItems: "center" }}>
+
+            <Text style={{ fontSize: 20, fontWeight: "bold" }}>You have to pay {this.state.fine} EGP {"\n"} </Text>
+
+            <Text style={{ fontWeight: "bold", color: "#ff0000" }}> Need more Details ? {"\n"} </Text>
+            <Text style={{ fontSize: 16 }}>Pick car owner driving license image from:</Text>
             <View style={GlobalStyle.flexRow}>
               <Button title="Gallery" onPress={this._pickImageFromGallery} />
               <Text style={styles.text}> OR </Text>
@@ -79,6 +84,10 @@ export default class FineScreen extends React.Component {
     const fine = await getFines(driverLicense)
     // Update the screen state
     this.setState({
+      firstLetter: driverLicenseData.firstLetter,
+      secondLetter: driverLicenseData.secondLetter,
+      thirdLetter: driverLicenseData.thirdLetter,
+      digits: driverLicenseData.digits,
       isReady: true,
       image: this.props.navigation.getParam("image"),
       fine: fine

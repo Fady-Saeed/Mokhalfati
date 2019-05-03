@@ -1,5 +1,6 @@
 import React from "react";
 import { ImagePicker, Camera, Permissions } from "expo";
+import * as Animatable from 'react-native-animatable';
 import GlobalStyle from "../constants/GlobalStyles";
 
 import {
@@ -41,9 +42,9 @@ export default class HomeScreen extends React.Component {
   render() {
     return (
       <View style={GlobalStyle.container}>
-        <Image source={require("../assets/images/MokhalfatiLOGO.png")} />
+        <Animatable.Image animation="rotate" duration={2000} iterationCount={5} iterationDelay={1000} style={{ width: 250, height: 250 }} source={require("../assets/images/MokhalfatiLOGO.png")} />
         {/*<MonoText style={GlobalStyle.logo}>Mokhalfati</MonoText>*/}
-        <MonoText>Pick your car license ID image from:</MonoText>
+        <Text style={{ fontSize: 20, marginTop: 6 }}>Pick your car license ID image from:</Text>
         <View style={GlobalStyle.flexRow}>
           <Button title="Gallery" onPress={this._pickImageFromGallery} />
           <Text style={styles.text}> OR </Text>
