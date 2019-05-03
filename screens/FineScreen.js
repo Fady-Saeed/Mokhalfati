@@ -6,7 +6,7 @@ import Constants from "../constants/Layout";
 import GlobalStyle from "../constants/GlobalStyles";
 import { MonoText } from "../components/StyledText";
 import { PLATE_FORMAT, getFines } from "../api/fines"
-import { getDriverLicenseData } from "../api/driverLicenseDataExtractor"
+import { getCarLicenseData } from "../api/carLicenseDataExtractor"
 
 export default class FineScreen extends React.Component {
   static navigationOptions = {
@@ -72,16 +72,16 @@ export default class FineScreen extends React.Component {
   }
   _getFines = async () => {
     // Send the image to be processed
-    const driverLicenseData = await getDriverLicenseData(this.props.navigation.getParam("image64"))
+    const carLicenseData = await getCarLicenseData(this.props.navigation.getParam("image64"))
     // Get fines from the traffic fines api
-    const driverLicense = {
+    const carLicense = {
       type: PLATE_FORMAT.ALPHA_NUMERIC,
-      firstLetter: driverLicenseData.firstLetter,
-      secondLetter: driverLicenseData.secondLetter,
-      thirdLetter: driverLicenseData.thirdLetter,
-      digits: driverLicenseData.digits
+      firstLetter: carLicenseData.firstLetter,
+      secondLetter: carLicenseData.secondLetter,
+      thirdLetter: carLicenseData.thirdLetter,
+      digits: carLicenseData.digits
     }
-    const fine = await getFines(driverLicense)
+    const fine = await getFines(carLicense)
     // Update the screen state
     this.setState({
       firstLetter: driverLicenseData.firstLetter,
