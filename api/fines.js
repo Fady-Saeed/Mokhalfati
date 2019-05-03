@@ -26,18 +26,18 @@ export const PLATE_FORMAT = {
     NUMERIC: "rdNum",
 }
 
-export const getFines = async (driverLicenseDataObject) => {
+export const getFines = async (carLicenseDataObject) => {
     const API_URL = "https://www.egypt.gov.eg/mobile/Services/NTPMOJ-GG/functions/PayFines.aspx"
     const form = await fetch(API_URL)
     const formText = await form.text()
     const params = getFormParams(formText)
     params["cSearch$PlateFormat"] =  PLATE_FORMAT.ALPHA_NUMERIC
-    switch (driverLicenseDataObject.type) {
+    switch (carLicenseDataObject.type) {
         case PLATE_FORMAT.ALPHA_NUMERIC:
-            params["cSearch$txtPlateAlpaNum$txtFL"] = driverLicenseDataObject.firstLetter
-            params["cSearch$txtPlateAlpaNum$txtSL"] = driverLicenseDataObject.secondLetter
-            params["cSearch$txtPlateAlpaNum$txtTL"] = driverLicenseDataObject.thirdLetter
-            params["cSearch$txtPlateAlpaNum$txtDg"] = driverLicenseDataObject.digits + ""
+            params["cSearch$txtPlateAlpaNum$txtFL"] = carLicenseDataObject.firstLetter
+            params["cSearch$txtPlateAlpaNum$txtSL"] = carLicenseDataObject.secondLetter
+            params["cSearch$txtPlateAlpaNum$txtTL"] = carLicenseDataObject.thirdLetter
+            params["cSearch$txtPlateAlpaNum$txtDg"] = carLicenseDataObject.digits + ""
             break;
     }
     const formData = new FormData()

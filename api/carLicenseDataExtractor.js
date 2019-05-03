@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 
-export const getDriverLicenseData = async (image) => {
-    const API_URL = "https://tranquil-stream-81171.herokuapp.com/driver"
+export const getCarLicenseData = async (image) => {
+    const API_URL = "https://tranquil-stream-81171.herokuapp.com/car"
     
     const formData = new FormData()
     
