@@ -1,5 +1,5 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, View, Image, Text, Button } from "react-native";
+import { ActivityIndicator, StyleSheet, View, Image, Text, Button, Platform } from "react-native";
 import { ImagePicker, Camera, Permissions } from "expo";
 import Colors from "../constants/Colors";
 import Constants from "../constants/Layout";
@@ -7,6 +7,7 @@ import GlobalStyle from "../constants/GlobalStyles";
 import { MonoText } from "../components/StyledText";
 import { PLATE_FORMAT, getFines } from "../api/fines"
 import { getCarLicenseData } from "../api/carLicenseDataExtractor"
+import { ScrollView } from "react-native-gesture-handler";
 
 export default class FineScreen extends React.Component {
   static navigationOptions = {
@@ -17,7 +18,7 @@ export default class FineScreen extends React.Component {
     secondLetter: null,
     thirdLetter: null,
     digits: null,
-    isReady: true,
+    isReady: false,
     fine: -1,
     image: null,
     licenseImage: null,
@@ -46,21 +47,27 @@ export default class FineScreen extends React.Component {
     return (
       <View style={GlobalStyle.container}>
         <Image source={require("../assets/images/MokhalfatiLOGO.png")} style={{ height: 150, width: 150 }} />
-        <Text> {this.state.firstLetter}{this.state.secondLetter}{this.state.thirdLetter}{this.state.digits}</Text>
-        <Image source={{ uri: this.state.image }} style={styles.image} />
+
+        <Text style={{ fontWeight: "bold", margin: 5, fontSize: 18 }}> Your Car license plate ID is {this.state.firstLetter} {this.state.secondLetter} {this.state.thirdLetter} {this.state.digits}</Text>
         {(this.state.fine) ? (
-          <View style={{ alignItems: "center" }}>
+          <ScrollView>
+            <View style={{ alignItems: "center" }}>
+              <Image source={{ uri: this.state.image }} style={styles.image} />
 
-            <Text style={{ fontSize: 20, fontWeight: "bold" }}>You have to pay {this.state.fine} EGP {"\n"} </Text>
 
-            <Text style={{ fontWeight: "bold", color: "#ff0000" }}> Need more Details ? {"\n"} </Text>
-            <Text style={{ fontSize: 16 }}>Pick car owner driving license image from:</Text>
-            <View style={GlobalStyle.flexRow}>
-              <Button title="Gallery" onPress={this._pickImageFromGallery} />
-              <Text style={styles.text}> OR </Text>
-              <Button title="Camera" onPress={this._pickImageFromCameraRoll} />
+
+              <Text style={{ fontSize: 20, fontWeight: "bold" }}>You have to pay {this.state.fine} EGP {"\n"} </Text>
+
+              <Text style={{ fontWeight: "bold", color: "#ff0000" }}> Need more Details ? {"\n"} </Text>
+              <Text style={{ fontSize: 16 }}>Pick car owner driving license image from:</Text>
+              <View style={GlobalStyle.flexRow}>
+                <Button title="Gallery" onPress={this._pickImageFromGallery} />
+                <Text style={styles.text}> OR </Text>
+                <Button title="Camera" onPress={this._pickImageFromCameraRoll} />
+              </View>
             </View>
-          </View>
+          </ScrollView>
+
         ) : null}
         {(!this.state.fine) ? (
           <View style={GlobalStyle.flexRow}>
@@ -84,10 +91,10 @@ export default class FineScreen extends React.Component {
     const fine = await getFines(carLicense)
     // Update the screen state
     this.setState({
-      firstLetter: driverLicenseData.firstLetter,
-      secondLetter: driverLicenseData.secondLetter,
-      thirdLetter: driverLicenseData.thirdLetter,
-      digits: driverLicenseData.digits,
+      firstLetter: carLicenseData.firstLetter,
+      secondLetter: carLicenseData.secondLetter,
+      thirdLetter: carLicenseData.thirdLetter,
+      digits: carLicenseData.digits,
       isReady: true,
       image: this.props.navigation.getParam("image"),
       fine: fine
@@ -98,10 +105,12 @@ export default class FineScreen extends React.Component {
     const { statusCameraRoll } = await Permissions.askAsync(
       Permissions.CAMERA_ROLL
     );
+
     let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
+      allowsEditing: false,
       base64: true
     });
+
     if (!result.cancelled) {
       this.setState({ licenseImage: result.uri, image64: result.base64 });
     }
@@ -111,7 +120,7 @@ export default class FineScreen extends React.Component {
     const { statusCameraRoll } = await Permissions.askAsync(
       Permissions.CAMERA_ROLL
     );
-    let result = await ImagePicker.launchCameraAsync({ allowsEditing: true, base64: true });
+    let result = await ImagePicker.launchCameraAsync({ allowsEditing: Platform.OS !== 'ios', base64: true });
     if (!result.cancelled) {
       this.setState({ licenseImage: result.uri, image64: result.base64 });
     }

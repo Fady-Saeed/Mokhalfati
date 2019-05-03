@@ -38,11 +38,11 @@ export default class HomeScreen extends React.Component {
       });
     }
   }
-
+  /*animation="rotate" duration={2000} iterationCount={5} iterationDelay={1000}*/
   render() {
     return (
       <View style={GlobalStyle.container}>
-        <Animatable.Image animation="rotate" duration={2000} iterationCount={5} iterationDelay={1000} style={{ width: 250, height: 250 }} source={require("../assets/images/MokhalfatiLOGO.png")} />
+        <Image style={{ width: 250, height: 250 }} source={require("../assets/images/MokhalfatiLOGO.png")} />
         {/*<MonoText style={GlobalStyle.logo}>Mokhalfati</MonoText>*/}
         <Text style={{ fontSize: 20, marginTop: 6 }}>Pick your car license ID image from:</Text>
         <View style={GlobalStyle.flexRow}>
