@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Mokhalfati",
-    "slug": "mokhalfati1",
+    "slug": "mokhalfati",
     "privacy": "public",
     "sdkVersion": "32.0.0",
     "platforms": [
@@ -10,7 +10,7 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/MokhalfatiLOGO.png",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -23,8 +23,20 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mokhalfati.app",
+      "icon": "./assets/images/MokhalfatiLOGO.png"
     },
-    "description": ""
+    "android": {
+      "package": "com.mokhalfati.app",
+      "versionCode": 1,
+      "icon": "./assets/images/MokhalfatiLOGO.png",
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA"
+      ]
+    },
+    "description": "Mokhalfati is a mobile app for getting the cost of fine applied for a car easily with just a pic of the car license."
   }
 }
