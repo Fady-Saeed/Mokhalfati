@@ -106,7 +106,7 @@ export default class FineScreen extends React.Component {
 
         {(this.state.noResult) ? (
           <View style={{ alignItems: "center", justifyContent: "center" }}>
-            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#ff0000" }}>Sorry, We couldn't retrieve information from the picture, please use another picture with high quality</Text>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#ff0000", textAlign: "center", padding: 5}}>Sorry, We couldn't retrieve information from the picture, please use another picture with high quality</Text>
           </View>
         ) : null}
 
