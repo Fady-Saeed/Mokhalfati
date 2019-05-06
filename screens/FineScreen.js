@@ -1,5 +1,5 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, View, Image, Text, Button, Platform } from "react-native";
+import { ActivityIndicator, StyleSheet, View, Image, Text, Button, Platform, Picker } from "react-native";
 import { ImagePicker, Camera, Permissions } from "expo";
 import * as Animatable from 'react-native-animatable';
 import Colors from "../constants/Colors";
@@ -15,14 +15,17 @@ export default class FineScreen extends React.Component {
     header: null
   };
   state = {
+    hasOptions: false,
+    OCRresult: null,
     firstLetter: null,
     secondLetter: null,
     thirdLetter: null,
     digits: null,
     isReady: false,
-    fine: -1,
+    fine: false,
     image: null,
     licenseImage: null,
+    selectedValue: 0,
   };
 
   componentDidUpdate(prevPops, prevState) {
@@ -34,9 +37,15 @@ export default class FineScreen extends React.Component {
     }
   }
 
+
   componentDidMount() {
-    this._getFines();
+    if (this.state.OCRresult === null) {
+      this._getFines();
+
+    }
   }
+
+
   render() {
     if (!this.state.isReady) {
       return (
@@ -45,20 +54,18 @@ export default class FineScreen extends React.Component {
         </View>
       );
     }
+    const ocrArr = this.state.OCRresult
     return (
       <View style={GlobalStyle.container}>
         <Animatable.Image animation="rotate" duration={2000} iterationCount={5} iterationDelay={1000} source={require("../assets/images/MokhalfatiLOGO.png")} style={{ height: 100, width: 100 }} />
 
-        <Text style={{ fontWeight: "bold", margin: 5, fontSize: 20 }}> Your Car license plate ID is {this.state.firstLetter} {this.state.secondLetter} {this.state.thirdLetter} {this.state.digits}</Text>
-        {(this.state.fine) ? (
+
+        {(this.state.fine && !this.state.hasOptions) ? (
           <ScrollView>
             <View style={{ alignItems: "center" }}>
               <Image source={{ uri: this.state.image }} style={styles.image} />
-
-
-
+              <Text style={{ fontWeight: "bold", margin: 5, fontSize: 20 }}>Your Car license plate ID is {this.state.firstLetter} {this.state.secondLetter} {this.state.thirdLetter} {this.state.digits}</Text>
               <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 5 }}>You have to pay {this.state.fine} EGP {"\n"} </Text>
-
               <Text style={{ fontWeight: "bold", color: "#ff0000" }}> Need more Details ? {"\n"} </Text>
               <Text style={{ fontSize: 16 }}>Pick car owner driving license image from:</Text>
               <View style={GlobalStyle.flexRow}>
@@ -68,41 +75,98 @@ export default class FineScreen extends React.Component {
               </View>
             </View>
           </ScrollView>
-
         ) : null}
-        {(!this.state.fine) ? (
+
+
+        {(!this.state.fine && !this.state.hasOptions) ? (
           <View style={{ alignItems: "center" }}>
             <Image source={{ uri: this.state.image }} style={styles.image} />
             <Text style={{ fontSize: 18, fontWeight: "bold" }}> Nice!, You are a committed driver{"\n"}</Text>
             <Text style={{ fontSize: 18, fontWeight: "bold", color: "#ff0000" }}>You don't have to pay a penny</Text>
           </View>
         ) : null}
+
+        {(this.state.hasOptions) ? (
+          <View style={{ alignItems: "center" }}>
+            <Image source={{ uri: this.state.image }} style={styles.image} />
+            <Text>Help Us by choosing the correct ID</Text>
+            <Picker style={{ height: 200, width: 300 }} selectedValue={this.state.selectedValue}
+              onValueChange={(itemValue, itemIndex) =>
+                this.setState({
+                  selectedValue: itemValue,
+
+                })}>
+              {ocrArr.map((element, i) =>
+                <Picker.Item label={element.firstLetter + element.secondLetter + element.thirdLetter + element.digits} value={i} key={i} />
+              )}
+            </Picker>
+            <Button title="Proceed" onPress={this._proceed} />
+          </View>
+
+        ) : null}
+
+
+
+
+
+
+
       </View>
     );
+  }
+
+  _proceed = async () => {
+    const index = this.state.selectedValue
+    console.log(index)
+    const userPreference = {
+      firstLetter: this.state.OCRresult[index].firstLetter,
+      secondLetter: this.state.OCRresult[index].secondLetter,
+      thirdLetter: this.state.OCRresult[index].thirdLetter,
+      digits: this.state.OCRresult[index].digits,
+    }
+    console.log(userPreference)
+    const fine = await getFines(userPreference)
+    console.log(fine)
+    this.setState({ fine: fine, hasOptions: false, image: this.props.navigation.getParam("image") })
+    this.forceUpdate()
+
   }
   _getFines = async () => {
     // Send the image to be processed
     const carLicenseData = await getCarLicenseData(this.props.navigation.getParam("image64"))
     // Get fines from the traffic fines api
     const carLicense = {
+      // takes array instead of single results
       type: PLATE_FORMAT.ALPHA_NUMERIC,
-      firstLetter: carLicenseData.firstLetter,
-      secondLetter: carLicenseData.secondLetter,
-      thirdLetter: carLicenseData.thirdLetter,
-      digits: carLicenseData.digits
+      firstLetter: carLicenseData[0].firstLetter,
+      secondLetter: carLicenseData[0].secondLetter,
+      thirdLetter: carLicenseData[0].thirdLetter,
+      digits: carLicenseData[0].digits
     }
-    const fine = await getFines(carLicense)
-    // Update the screen state
-    this.setState({
-      firstLetter: carLicenseData.firstLetter,
-      secondLetter: carLicenseData.secondLetter,
-      thirdLetter: carLicenseData.thirdLetter,
-      digits: carLicenseData.digits,
-      isReady: true,
-      image: this.props.navigation.getParam("image"),
-      fine: fine
-    });
-  };
+
+    if (carLicenseData.length === 1) {
+      const fine = await getFines(carLicense)
+      this.setState({
+        hasOptions: false,
+        isReady: true,
+        firstLetter: carLicenseData[0].firstLetter,
+        secondLetter: carLicenseData[0].secondLetter,
+        thirdLetter: carLicenseData[0].thirdLetter,
+        digits: carLicenseData[0].digits,
+        fine: fine,
+        image: this.props.navigation.getParam("image"),
+      })
+    }
+    else {
+      this.setState({
+        fine: 0,
+        hasOptions: true,
+        isReady: true,
+        OCRresult: carLicenseData,
+        image: this.props.navigation.getParam("image"),
+      });
+    };
+  }
 
   _pickImageFromGallery = async () => {
     const { statusCameraRoll } = await Permissions.askAsync(

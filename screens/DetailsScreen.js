@@ -21,7 +21,7 @@ export default class DetailsScreen extends React.Component {
         fineDetails: {
             totalWithoutTaxes: -1,
             taxes: -1,
-            detailedList: []
+            detailedList: [],
         }
     };
     componentDidMount() {
