@@ -91,7 +91,7 @@ export default class FineScreen extends React.Component {
           <View style={{ alignItems: "center" }}>
             <Image source={{ uri: this.state.image }} style={styles.image} />
             <Text style={{ fontSize: 18, fontWeight: "bold", margin: 4 }}>Help Us by choosing the correct ID</Text>
-            <Picker style={{ height: 200, width: 200 }} selectedValue={this.state.selectedValue}
+            <Picker style={{ height: Platform.OS === 'ios' ? 200 : 50, width: 200 }} selectedValue={this.state.selectedValue}
               onValueChange={(itemValue, itemIndex) =>
                 this.setState({
                   selectedValue: itemValue,
