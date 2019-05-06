@@ -17,6 +17,8 @@ export default class DetailsScreen extends React.Component {
     tableHeaders = ["Title", "Location", "Date", "Amount"]
     state = {
         isReady: false,
+        isError: false,
+        errorMessage: "",
         image: null,
         fineDetails: {
             totalWithoutTaxes: -1,
@@ -54,25 +56,35 @@ export default class DetailsScreen extends React.Component {
                 ) : null}
 
 
-                {(this.state.fineDetails.type && this.state.fineDetails.type === "error") ? (
+                {(this.state.isError) ? (
                     <View style={GlobalStyle.container}>
-                        <Text style={{ fontWeight: "bold", color: "#ff0000" }}> {this.state.fineDetails.message} </Text>
+                        <Text style={{ fontWeight: "bold", color: "#ff0000" }}>{this.state.errorMessage}</Text>
                     </View>
                 ) : null}
             </View>
         );
     }
     _getDetailedFines = async () => {
-        // Send the image to be processed
-        const driverLicenseData = await getDriverLicenseData(this.props.navigation.getParam("image64"))
-        // Get driver ID 
-        const fineDetails = await getDetailedFines(driverLicenseData)
-        // Update the screen state
-        this.setState({
-            isReady: true,
-            image: this.props.navigation.getParam("image"),
-            fineDetails: fineDetails
-        });
+        try{
+            // Send the image to be processed
+            const driverLicenseData = await getDriverLicenseData(this.props.navigation.getParam("image64"))
+            // Get driver ID 
+        
+            const fineDetails = await getDetailedFines(driverLicenseData)
+            // Update the screen state
+            this.setState({
+                isReady: true,
+                image: this.props.navigation.getParam("image"),
+                fineDetails: fineDetails
+            });
+        } catch(e) {
+            this.setState({
+                isError: true,
+                isReady: true,
+                errorMessage: e.message
+            });
+        }
+        
     };
 }
 

@@ -73,6 +73,9 @@ export const getDetailedFines = async (driverLicenseDataObject) => {
 
     const detailedFinesPage = await fetch(API_URL, options)
     const detailedFinesText = await detailedFinesPage.text()
-    console.log(parseDetailedFines(detailedFinesText))
-    return parseDetailedFines(detailedFinesText)
+    const detailedFinesParsed = parseDetailedFines(detailedFinesText)
+    if(detailedFinesParsed.type === "error") {
+        throw new Error(detailedFinesParsed.message)
+    }
+    return detailedFinesParsed
 }
