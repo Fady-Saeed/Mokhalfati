@@ -26,6 +26,7 @@ export default class FineScreen extends React.Component {
     image: null,
     licenseImage: null,
     selectedValue: 0,
+    noResult: false,
   };
 
   componentDidUpdate(prevPops, prevState) {
@@ -78,7 +79,7 @@ export default class FineScreen extends React.Component {
         ) : null}
 
 
-        {(!this.state.fine && !this.state.hasOptions) ? (
+        {(!this.state.fine && !this.state.hasOptions && !this.state.noResult) ? (
           <View style={{ alignItems: "center" }}>
             <Image source={{ uri: this.state.image }} style={styles.image} />
             <Text style={{ fontSize: 18, fontWeight: "bold" }}> Nice!, You are a committed driver{"\n"}</Text>
@@ -89,27 +90,25 @@ export default class FineScreen extends React.Component {
         {(this.state.hasOptions) ? (
           <View style={{ alignItems: "center" }}>
             <Image source={{ uri: this.state.image }} style={styles.image} />
-            <Text>Help Us by choosing the correct ID</Text>
-            <Picker style={{ height: 200, width: 300 }} selectedValue={this.state.selectedValue}
+            <Text style={{ fontSize: 18, fontWeight: "bold", margin: 4 }}>Help Us by choosing the correct ID</Text>
+            <Picker style={{ height: 200, width: 200 }} selectedValue={this.state.selectedValue}
               onValueChange={(itemValue, itemIndex) =>
                 this.setState({
                   selectedValue: itemValue,
-
                 })}>
               {ocrArr.map((element, i) =>
-                <Picker.Item label={element.firstLetter + element.secondLetter + element.thirdLetter + element.digits} value={i} key={i} />
+                <Picker.Item label={element.firstLetter + " " + element.secondLetter + " " + element.thirdLetter + " " + element.digits} value={i} key={i} />
               )}
             </Picker>
             <Button title="Proceed" onPress={this._proceed} />
           </View>
-
         ) : null}
 
-
-
-
-
-
+        {(this.state.noResult) ? (
+          <View style={{ alignItems: "center", justifyContent: "center" }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#ff0000" }}>Sorry, We couldn't retrieve information from the picture, please use another picture with high quality</Text>
+          </View>
+        ) : null}
 
       </View>
     );
@@ -118,7 +117,11 @@ export default class FineScreen extends React.Component {
   _proceed = async () => {
     const index = this.state.selectedValue
     console.log(index)
+    this.setState({
+      isReady: false
+    })
     const userPreference = {
+      type: PLATE_FORMAT.ALPHA_NUMERIC,
       firstLetter: this.state.OCRresult[index].firstLetter,
       secondLetter: this.state.OCRresult[index].secondLetter,
       thirdLetter: this.state.OCRresult[index].thirdLetter,
@@ -127,13 +130,38 @@ export default class FineScreen extends React.Component {
     console.log(userPreference)
     const fine = await getFines(userPreference)
     console.log(fine)
-    this.setState({ fine: fine, hasOptions: false, image: this.props.navigation.getParam("image") })
+    this.setState({
+      fine: fine,
+      hasOptions: false,
+      noResult: false,
+      image: this.props.navigation.getParam("image"),
+      firstLetter: this.state.OCRresult[index].firstLetter,
+      secondLetter: this.state.OCRresult[index].secondLetter,
+      thirdLetter: this.state.OCRresult[index].thirdLetter,
+      digits: this.state.OCRresult[index].digits,
+      isReady: true
+    })
     this.forceUpdate()
 
   }
   _getFines = async () => {
+    let carLicenseData
     // Send the image to be processed
-    const carLicenseData = await getCarLicenseData(this.props.navigation.getParam("image64"))
+    try {
+      const carData = await getCarLicenseData(this.props.navigation.getParam("image64"))
+      carLicenseData = carData
+    } catch (Error) {
+      console.log("no result")
+      this.setState({
+        noResult: true,
+        isReady: true,
+        fine: false,
+        hasOptions: false
+      })
+      this.forceUpdate()
+      return 0
+    }
+
     // Get fines from the traffic fines api
     const carLicense = {
       // takes array instead of single results
@@ -147,6 +175,7 @@ export default class FineScreen extends React.Component {
     if (carLicenseData.length === 1) {
       const fine = await getFines(carLicense)
       this.setState({
+        noResult: false,
         hasOptions: false,
         isReady: true,
         firstLetter: carLicenseData[0].firstLetter,
@@ -160,12 +189,14 @@ export default class FineScreen extends React.Component {
     else {
       this.setState({
         fine: 0,
+        noResult: false,
         hasOptions: true,
         isReady: true,
         OCRresult: carLicenseData,
         image: this.props.navigation.getParam("image"),
       });
     };
+
   }
 
   _pickImageFromGallery = async () => {
